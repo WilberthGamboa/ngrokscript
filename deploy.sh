@@ -3,18 +3,25 @@
 # Apagar NGINX
 sudo systemctl stop nginx
 
-# Apagar NGROK
+# Apagar NGROK si está corriendo
 killall ngrok
 
 # Clonar el repositorio (asegurando que estás en el directorio correcto)
-cd /ruta/a/tu/repositorio
-git pull
+cd /var/www/webdevops
+sudo git pull
 
 # Encender NGINX
 sudo systemctl start nginx
 
-# Generar URL de NGROK y desplegarla
-ngrok_url=$(ngrok http 80 | grep -oE "http://[a-z0-9\.]+.ngrok.io")
+# Iniciar NGROK en segundo plano
+sudo ngrok http 80 > /dev/null &
+echo "NGROK iniciado."
+
+# Esperar un momento para asegurar que ngrok se haya iniciado correctamente
+sleep 2
+
+# Obtener la URL de NGROK
+ngrok_url=$(curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')
 echo "La URL de NGROK es: $ngrok_url"
 
 # Mantener el script en espera hasta que se interrumpa manualmente (Ctrl+C)
